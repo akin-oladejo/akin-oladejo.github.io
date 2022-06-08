@@ -7,3 +7,13 @@
     --white: #ffffff;
 }
 
+* {
+    border: 1px solid red;
+    box-sizing: border-box;
+}
+
+body {
+    display: grid;
+    grid-template-columns: 2fr 5fr 3fr;
+    background: var(--off-white);
+}
