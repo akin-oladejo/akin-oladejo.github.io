@@ -14,21 +14,23 @@
 }
 
 body {
-    display: grid;
-    column-gap: 1.5rem;
-    grid-template-columns: 10%  minmax(0, 1fr)  20%;
-    grid-template-rows: 2fr 3fr 2fr;
+    
     width:100%;
     /*change this later*/
-    color: var(--white);
+    color: var(--black);
     height: 100vh;
     overflow-x: hidden;
     overflow-y: hidden;
 }
 
 body.post-page {
+    display: grid;
+    column-gap: 1.5rem;
+    grid-template-columns: 10%  minmax(0, 1fr)  20%;
+    grid-template-rows: 2fr 3fr 2fr;
     background: var(--black);
     padding-top: 3rem;
+    color: var(--white);
 }
 
 /*---------------------- Beginning of custom scrollbar--------------- */
@@ -129,24 +131,28 @@ div.left-nav {
     padding-bottom: 4rem;
     font-family: 'Open Sans';
     padding-left: 2rem;
+    font-size: 1.3rem;
 }
 
 div.left-nav > p {
     width: fit-content;
-    padding: .3rem;
+    padding: 0 .3rem;
+    margin: 0;
 }
 
 div.button {
     padding: 0 .3rem;
     height: max-content;
+    text-decoration: none;
 }
 
 div.button:hover {
     background: var(--just-dark);
     cursor: pointer;
+    color: var(--grass);
 }
 
 div.button:visited {
-    color: initial;
-    
+    text-decoration: none;
+    color: var(--white);
 }
