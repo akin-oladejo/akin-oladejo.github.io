@@ -37,7 +37,7 @@ body.post-page {
   
   /* Track */
   ::-webkit-scrollbar-track {
-    background: var(--off-white);
+    background: #30303068;
   }
   
   /* Handle */
