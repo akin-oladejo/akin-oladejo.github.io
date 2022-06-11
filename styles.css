@@ -86,7 +86,7 @@ div.post-body > h3 {
 
 div.post-body > blockquote {
     border-left: 0.2rem solid var(--grass);
-    padding-left: 0.3rem;
+    padding-left: 0.5rem;
 }
 
 ol.list-container {
@@ -143,7 +143,6 @@ div.left-nav > p {
 div.button {
     padding: 0 .3rem;
     height: max-content;
-    text-decoration: none;
 }
 
 div.button:hover {
@@ -152,7 +151,7 @@ div.button:hover {
     color: var(--grass);
 }
 
-div.button:visited {
+a, a:hover, a:focus, a:active {
     text-decoration: none;
-    color: var(--white);
+    color: inherit;
 }
