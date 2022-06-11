@@ -27,6 +27,7 @@ body {
 
 body.post-page {
     background: var(--black);
+    padding-top: 3rem;
 }
 
 /*---------------------- Beginning of custom scrollbar--------------- */
