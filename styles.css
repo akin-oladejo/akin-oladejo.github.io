@@ -60,6 +60,7 @@ div.post-body {
     font-family: 'Open Sans';
     font-weight: 400;
     line-height: 1.6rem;
+    padding-bottom: 5rem;
 }
 
 div.post-body > h1 {
