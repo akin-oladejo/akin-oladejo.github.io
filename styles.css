@@ -33,6 +33,7 @@
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
     background: var(--grass);
+    cursor: pointer;
 }
 
 /*--------------------- End of custom scrollbar-------------------- */
