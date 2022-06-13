@@ -1,29 +1,61 @@
-let viewportHeight = window.innerHeight;
-let viewportWidth = window.innerWidth;
-
-let side_right = document.getElementById('side-right');
-
-// make page proportionate size throughout resize like cssgrids.com
-function fixSideSize() {
-    let scale = viewportHeight / window.innerHeight;
-
-}
-
 // function to hide scrollbar when not scrolling
-function toggleScrollBar() {
-    // let scrollbar = document.querySelector(scrollbars)
+// function toggleScrollBar() {
+//     // let scrollbar = document.querySelector(scrollbars)
+// }
+
+var page = window.location.pathname.split('/').pop();
+console.log(page)
+
+if (page == 'about.html') {
+  const $about_HomeBtn = document.querySelector('.button2');
+  const about_to_home = document.getElementById('arrow_a_home');
+  $about_HomeBtn.onmouseover = () => {
+    about_to_home.animate([
+      { left: '0' },
+      { left: '10px' },
+      { left: '0' }
+    ], {
+      duration: 1000,
+      iterations: 2
+    });
+  }
+} else if (page == 'posts.html'){
+  const post_HomeBtn = document.getElementById('posts_home')
+  const arrow_home = document.getElementById('arrow_p_home');
+  const point = document.getElementById('point')
+  post_HomeBtn.onmouseover = () => {
+    arrow_home.style.display = 'block'
+    // point.style.display = 'none'
+    arrow_home.animate([
+      { left: '0' },
+      { left: '10px' },
+      { left: '0' }
+    ], {
+      duration: 1000,
+      iterations: 2
+    });
+    post_HomeBtn.onmouseout = () => {
+      arrow_home.style.display = 'none'
+      // point.style.display = 'inline'
+    }
+  }
+
+  const post_AboutBtn = document.getElementById('posts_about')
+  const arrow_about = document.getElementById('arrow_p_about');
+  post_AboutBtn.onmouseover = () => {
+    arrow_about.style.display = 'block'
+    arrow_about.animate([
+      { left: '0' },
+      { left: '10px' },
+      { left: '0' }
+    ], {
+      duration: 1000,
+      iterations: 2
+    });
+  }
+  post_AboutBtn.onmouseout = () => {
+    arrow_about.style.display = 'none'
+  }
 }
 
-const $icon = document.querySelector('.button2');
-const $arrow = document.querySelector('.arrow');
 
-$icon.onmouseover = () => {
-  $arrow.animate([
-    {left: '0'},
-    {left: '10px'},
-    {left: '0'}
-  ],{
-    duration: 1000,
-    iterations: 2
-  });
-}

@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles.css">
     <title>posts - small data by dami</title>
+    <script src="script.js" async="true"></script>
 </head>
 
 <body class="post-page">
@@ -19,9 +20,19 @@
 
     <!-- left side nav bar -->
     <div class="left-nav">
-        <a href="index.html"><div class="button"><img src="icons/white arrow.png" class="arrow" alt="left arrow"><br>HOME</div></a>
-        <p>•</p>
-        <a href="about.html"><div class="button"><img src="icons/white arrow.png" class="arrow" alt="left arrow"><br>ABOUT</div></a>
+        <div id="posts_home">
+            <img src="icons/white arrow.png" class="arrow" alt="left arrow" id="arrow_p_home">
+            <a href="index.html">
+                <div class="bflex" id="posts_home">HOME</div>
+            </a>
+        </div>
+        <p id="point">•</p>
+        <div id="posts_about">
+            <img src="icons/white arrow.png" class="arrow" alt="left arrow" id="arrow_p_about">
+            <a href="about.html">
+                <div class="bflex">ABOUT</div>
+            </a>
+        </div>
     </div>
 
     <!-- body of post -->
@@ -71,7 +82,8 @@
             at least laugh the results off. Is this sentence not expendable? In fact, learned models are favourable when
             they minimise risk. This is an ideal scenario to trust them.
             To understand the idea of low-risk, give thought to what is written of the renowned painter Michelangelo:
-        <blockquote cite="https://vocal.media/fyi/michelangelo-hated-painting-the-sistine-chapel-so-much-he-wrote-a-poem-about-it">
+        <blockquote
+            cite="https://vocal.media/fyi/michelangelo-hated-painting-the-sistine-chapel-so-much-he-wrote-a-poem-about-it">
             Michelangelo also hired assistants to grind
             colors, mix paints, trim and clean brushes, and take care of
             other mundane tasks, and he recruited other artists and instructed them in the technique of fresco
