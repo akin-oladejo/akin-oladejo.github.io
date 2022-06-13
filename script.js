@@ -11,9 +11,9 @@ if (page == 'about.html') {
   const about_to_home = document.getElementById('arrow_a_home');
   $about_HomeBtn.onmouseover = () => {
     about_to_home.animate([
-      { left: '0' },
-      { left: '10px' },
-      { left: '0' }
+      { right: '0' },
+      { right: '10px' },
+      { right: '0' }
     ], {
       duration: 1000,
       iterations: 2
@@ -27,12 +27,12 @@ if (page == 'about.html') {
     arrow_home.style.display = 'block'
     // point.style.display = 'none'
     arrow_home.animate([
-      { left: '0' },
-      { left: '10px' },
-      { left: '0' }
+      { right: '0' },
+      { right: '10px' },
+      { right: '0' }
     ], {
       duration: 1000,
-      iterations: 2
+      iterations: 3
     });
     post_HomeBtn.onmouseout = () => {
       arrow_home.style.display = 'none'
@@ -45,9 +45,9 @@ if (page == 'about.html') {
   post_AboutBtn.onmouseover = () => {
     arrow_about.style.display = 'block'
     arrow_about.animate([
-      { left: '0' },
-      { left: '10px' },
-      { left: '0' }
+      { right: '0' },
+      { right: '10px' },
+      { right: '0' }
     ], {
       duration: 1000,
       iterations: 2

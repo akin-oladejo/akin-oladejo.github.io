@@ -10,7 +10,7 @@
 }
 
 * {
-    border: 1px solid red;
+    /* border: 1px solid red; */
     box-sizing: border-box;
 }
 
@@ -163,13 +163,33 @@ a:active {
     color: inherit;
 }
 
+div.button2 {
+    padding: 0.5rem;
+    height: max-content;
+    font-family: 'Open Sans';
+    font-weight: bold;
+    width: 100%;
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: flex-end;
+    /* align-items: flex-start; */
+    /* justify-content: ; */
+    /* height: 5rem;  */
+}
+
+div.button2:hover {
+    cursor: pointer;
+    background: var(--dark-grass);
+}
+
 div.bflex {
     display: flex;
     flex-flow: row nowrap;
-    align-items: flex-start;
+    align-items: flex-end;
     width: 100%;
     font-weight: bold;
     color: var(--dark-grass);
+    
 }
 
 div.bflex:hover {
@@ -179,29 +199,16 @@ div.bflex:hover {
 }
 
 
-div.button2 {
-    padding: 0;
-    height: max-content;
-    font-family: 'Open Sans';
-    font-weight: bold;
-    /* display: flex;
-    flex-flow: column nowrap;
-    height: max-content; */
-}
-
-div.button2:hover {
-    cursor: pointer;
-}
-
 .arrow {
     position: relative;
     top: .2rem;
     width: 2rem;
     height: 2rem;
-    animation: arrow 700ms linear infinite;
+    /* animation: arrow 700ms linear infinite; */
+    /* animation: 700ms linear 200ms 2 alternate slidein; */
 }
 
-.arrow::after,
+/* .arrow::after,
 .arrow::before {
     content: '';
     position: absolute;
@@ -209,9 +216,9 @@ div.button2:hover {
     height: 10px;
     right: -8px;
     background-color: var(--off-white);
-}
+} */
 
-.arrow::after {
+/* .arrow::after {
     top: -12px;
     transform: rotate(45deg);
 }
@@ -220,7 +227,7 @@ div.button2:hover {
     top: 12px;
     box-shadow: 0 3px 5px rgba(0, 0, 0, .2);
     transform: rotate(-45deg);
-}
+} */
 
 #arrow_p_home, #arrow_p_about {
     display: none;
