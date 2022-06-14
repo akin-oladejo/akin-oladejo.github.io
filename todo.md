@@ -16,3 +16,4 @@
 ⬜ filter by tag
 ⬜ return results from tag click
 ⬜ add search functionality
+⬜ add favicon
