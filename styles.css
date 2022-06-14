@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Abhaya+Libre&family=Open+Sans:wght@400;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&display=swap');
 
 :root {
     --black: #000000;
@@ -7,6 +7,7 @@
     --just-dark: #303030;
     --shy-dark: #a1a1a14e;
     --dark-grass: #52a32f;
+    --date-dark: #7c7c7c;
 }
 
 * {
@@ -17,12 +18,12 @@
 /*---------------------- Beginning of custom scrollbar--------------- */
 /* width */
 ::-webkit-scrollbar {
-    width: 0.3rem;
+    width: 0.6rem;
 }
 
 /* Track */
 ::-webkit-scrollbar-track {
-    background: #30303068;
+    background: #3030302b;
 }
 
 /* Handle */
@@ -36,6 +37,15 @@
     cursor: pointer;
 }
 
+body.about-page>div.post-body::-webkit-scrollbar-track {
+    background: var(--shy-dark);
+    background: #4e4d4d13;
+}
+
+body.about-page>div.post-body::-webkit-scrollbar-thumb {
+    background: var(--dark-grass);
+}
+
 /*--------------------- End of custom scrollbar-------------------- */
 
 body {
@@ -45,15 +55,19 @@ body {
     height: 100vh;
     overflow-x: hidden;
     overflow-y: hidden;
-}
-
-body.post-page {
     display: grid;
     column-gap: 1.5rem;
     grid-template-columns: 10% minmax(0, 1fr) 20%;
     grid-template-rows: 2fr 3fr 2fr;
-    background: var(--black);
     padding-top: 3rem;
+}
+
+/* body.list-page {
+
+} */
+
+body.post-page {
+    background: var(--black);
     color: var(--off-white);
 }
 
@@ -62,12 +76,23 @@ body.about-page {
     color: var(--black);
 }
 
-body.about-page>div.post-body::-webkit-scrollbar-track {
-    background: var(--shy-dark);
+body.posts-page {
+    background: var(--off-white);
+    color: var(--black);
+    grid-template-columns: 10% minmax(0, 2fr) minmax(0, 3fr) 20%;
 }
 
-body.about-page>div.post-body::-webkit-scrollbar-thumb {
-    background: var(--dark-grass);
+.title {
+    font-size: 5rem;
+    line-height: 4.2rem;
+    font-family: 'Open Sans';
+    font-weight: 800;
+}
+
+.posts-header {
+    height: fit-content;
+    width: fit-content;
+    align-self: center;
 }
 
 div.post-body {
@@ -125,12 +150,26 @@ div.rect {
 
 div.right-text {
     grid-area: 2/3/2/-1;
-    font-size: 5rem;
-    line-height: 4.2rem;
+    /* font-size: 5rem; */
+    /* line-height: 4.2rem; */
     z-index: 100;
     margin: auto;
-    font-family: 'Open Sans';
-    font-weight: 800;
+    /* font-family: 'Open Sans'; */
+    /* font-weight: 800; */
+}
+
+div.rect-posts {
+    grid-area: 1/4/-1/-1;
+    background: var(--grass);
+    width: 55%;
+    height: 100%;
+    margin: auto;
+}
+
+div.right-text-posts {
+    grid-area: 2/4/2/-1;
+    z-index: 100;
+    margin: auto;
 }
 
 div.left-nav {
@@ -146,7 +185,7 @@ div.left-nav {
     padding-bottom: 4rem;
     font-family: 'Open Sans';
     font-size: 1.3rem;
-    
+
 }
 
 p#point {
@@ -189,7 +228,7 @@ div.bflex {
     width: 100%;
     font-weight: bold;
     color: var(--dark-grass);
-    
+
 }
 
 div.bflex:hover {
@@ -229,13 +268,88 @@ div.bflex:hover {
     transform: rotate(-45deg);
 } */
 
-#arrow_p_home, #arrow_p_about {
+#arrow_p_home,
+#arrow_p_about {
     display: none;
 }
 
-#posts_about, #posts_home {
-    padding:0;
+#posts_about,
+#posts_home {
+    padding: 0;
     display: flex;
     flex-flow: column nowrap;
     align-items: flex-end;
+}
+
+.blacktext {
+    color: var(--black) !important;
+}
+
+div.list-body {
+    grid-area: 2/2/-1/4;
+    overflow: scroll;
+    overflow-x: hidden;
+    display: flex;
+    flex-flow: column nowrap;
+}
+
+.thumbnail-box {
+    width: 22rem;
+}
+
+img.thumbnail {
+    width: 100%;
+    height: 11rem;
+    object-fit: cover;
+}
+
+
+.single-post {
+    display: flex;
+    flex-direction: row nowrap;
+    font-family: 'Open Sans';
+    justify-content: space-between;
+    margin-bottom: 2rem;
+}
+
+.post-details {
+    width: 28rem;
+    height: 11rem;
+    display: flex;
+    flex-flow: column nowrap;
+}
+
+.post-title {
+    font-size: 1.3rem;
+    height: 5.5rem;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical; 
+}
+
+.post-author {
+    font-weight: 600;
+}
+
+.post-date {
+    font-weight: 600;
+    color: var(--date-dark);
+}
+
+.tag-list {
+    display: flex;
+    flex-flow: row wrap;
+}
+
+.tag {
+    border: 0.1rem solid var(--date-dark);
+    padding: 0.1rem 0.2rem;
+    margin-right: 0.3rem;
+}
+
+.enter-post > div:hover {
+    background: var(--grass);
+    cursor: pointer;
+    font-weight: 800;
 }

@@ -1,11 +1,13 @@
-// function to hide scrollbar when not scrolling
 // function toggleScrollBar() {
 //     // let scrollbar = document.querySelector(scrollbars)
 // }
 
+// get page name
 var page = window.location.pathname.split('/').pop();
-console.log(page)
+console.log('posts.html')
+console.log(['title.html', 'posts.html'].includes(page))
 
+// animate back button on each page
 if (page == 'about.html') {
   const $about_HomeBtn = document.querySelector('.button2');
   const about_to_home = document.getElementById('arrow_a_home');
@@ -16,10 +18,10 @@ if (page == 'about.html') {
       { right: '0' }
     ], {
       duration: 1000,
-      iterations: 2
+      iterations: 3
     });
   }
-} else if (page == 'posts.html'){
+} else if (['title.html', 'posts.html'].includes(page)){
   const post_HomeBtn = document.getElementById('posts_home')
   const arrow_home = document.getElementById('arrow_p_home');
   const point = document.getElementById('point')
@@ -50,7 +52,7 @@ if (page == 'about.html') {
       { right: '0' }
     ], {
       duration: 1000,
-      iterations: 2
+      iterations: 3
     });
   }
   post_AboutBtn.onmouseout = () => {
