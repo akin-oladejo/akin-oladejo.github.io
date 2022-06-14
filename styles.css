@@ -346,6 +346,7 @@ img.thumbnail {
     border: 0.1rem solid var(--date-dark);
     padding: 0.1rem 0.2rem;
     margin-right: 0.3rem;
+    font-weight: 400;
 }
 
 .enter-post > div:hover {

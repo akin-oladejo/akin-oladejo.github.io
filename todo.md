@@ -13,3 +13,5 @@
 ⬜ add comments to js file
 ⬜ handle long titles for posts list (set short titles)
 ⬜ handle many tags for posts list (set short titles)
+⬜ filter by tag
+⬜ return results from tag click
