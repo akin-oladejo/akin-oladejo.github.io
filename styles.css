@@ -64,6 +64,7 @@
 
 .index {
     background: var(--black);
+    overflow: hidden;
 }
 
 .cont {
@@ -116,7 +117,6 @@
     font-size: 2rem;
     grid-area: 3/3/4/4;
     height: 100%;
-    overflow: hidden;
 }
 
 body.title-page {
