@@ -15,3 +15,4 @@
 ⬜ handle many tags for posts list (set short titles)
 ⬜ filter by tag
 ⬜ return results from tag click
+⬜ add search functionality
