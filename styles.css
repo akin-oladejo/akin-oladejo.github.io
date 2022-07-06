@@ -419,3 +419,11 @@ img.thumbnail {
     cursor: pointer;
     font-weight: 800;
 }
+
+#ind-pos {
+    background: var(--dark-grass);
+}
+
+#ind-pos:hover {
+    color: var(--black);
+}
