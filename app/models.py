@@ -3,7 +3,6 @@ from sqlalchemy.orm import relationship
 
 from .database import Base
 
-
 class Blog(Base):
     __tablename__ = "blogs"
 
