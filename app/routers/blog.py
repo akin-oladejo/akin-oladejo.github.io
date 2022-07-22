@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Request, UploadFile, Form, status
+from fastapi import APIRouter, Depends, UploadFile, Form, status, HTTPException
 from .. import schemas, repo, models
 from sqlalchemy.orm import Session
 from fastapi.encoders import jsonable_encoder
@@ -9,34 +9,66 @@ router = APIRouter(tags=["blog"], prefix="/blog")
 
 get_db = repo.get_db
 
-@router.post("/", response_model=schemas.Blog)
+
+@router.post("/", response_model=schemas.ShowBlog, status_code=status.HTTP_201_CREATED)
 async def create_post(
     *,
     db: Session = Depends(get_db),
-    title: str = Form(default='default value to be set to required later'),
-    body: str = Form(default='default value to be set to required later'),
-    thumbnail:  UploadFile | None = None,
+    title: str = Form(default="default value to be set to required later"),
+    body: str = Form(default="default value to be set to required later"),
+    thumbnail: UploadFile | None = None,
 ):
     if thumbnail:
-        if thumbnail.content_type not in ['image/jpeg', 'image/png']:
+        if thumbnail.content_type not in ["image/jpeg", "image/png"]:
             raise UploadFormatException(
                 file_name=thumbnail.filename,
-                error_message='The current accepted file types are PNG and JPEG'
+                error_message="The current accepted file types are PNG and JPEG",
             )
-        else: 
-            content = await thumbnail.read()
+        else:
+            thumbnail = await thumbnail.read()
 
-            # encode the thumbnail into b64 string
-            thumbnail =  base64.b64encode(content)
-    
     # call the create_post function
-    return repo.create_post(db, title, body, thumbnail)
+    return repo.create_post(db=db, title=title, body=body, thumbnail=thumbnail)
 
-@router.get('/', summary='Get All Blog Posts')
-def read_all_posts(db:Session = Depends(get_db), skip:int = 0, limit:int = 10):
+
+@router.get(
+    "/",
+    summary="Get All Blog Posts",
+    response_model=list[schemas.ShowBlog],
+    status_code=status.HTTP_200_OK,
+)
+def read_all_posts(db: Session = Depends(get_db), skip: int = 0, limit: int = 10):
     return repo.read_all_posts(db, skip, limit)
 
-@router.get("/{id}")
-def read_post(*, db:Session = Depends(get_db), blog_id:int):
-    return repo.read_post(db, blog_id=blog_id)
-    # remember to decode the string representation of the thumbnail
+
+@router.get("/{id}", summary="Get Single Blog Post", status_code=status.HTTP_200_OK, response_model=schemas.ShowBlog)
+def read_post(*, db: Session = Depends(get_db), post_id: int):
+    post = repo.read_post(db, post_id)
+    return post
+
+
+@router.put("/{id}", status_code=status.HTTP_202_ACCEPTED)
+async def update_post(
+    *,
+    db: Session = Depends(get_db),
+    post_id: int,
+    title: str = Form(default=None),
+    body: str = Form(default=None),
+    thumbnail: UploadFile | None = None,
+):
+    # convert the thumbnail to bytes
+    if thumbnail:
+        if thumbnail.content_type not in ["image/jpeg", "image/png"]:
+            raise UploadFormatException(
+                file_name=thumbnail.filename,
+                error_message="The current accepted file types are PNG and JPEG",
+            )
+        else:
+            thumbnail = await thumbnail.read()
+
+    return repo.update_post(db, post_id, title, body, thumbnail)
+
+
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_post(*, db: Session = Depends(get_db), post_id: int):
+    return repo.delete_post(db, post_id)

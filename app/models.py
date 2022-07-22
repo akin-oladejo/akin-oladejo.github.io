@@ -7,14 +7,16 @@ class Blog(Base):
     __tablename__ = "blogs"
 
     id = Column(Integer, primary_key=True, index=True)
-    thumbnail = Column(LargeBinary, index=True)
     title = Column(String, index=True)
     body = Column(String, index=True)
     pub_datetime = Column(DateTime)
+    latest_update = Column(DateTime)
+    thumbnail = Column(LargeBinary, index=True)
     writer_id = Column(Integer, ForeignKey("users.id"))
     
     # comments = relationship(Integer, ForeignKey)
     writer = relationship('User', back_populates='blogs')
+
 
 class User(Base):
     __tablename__ = "users"
