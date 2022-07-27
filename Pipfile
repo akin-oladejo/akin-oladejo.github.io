@@ -7,6 +7,9 @@ name = "pypi"
 fastapi = "*"
 uvicorn = "*"
 python-multipart = "*"
+sqlalchemy = "*"
+passlib = {extras = ["bcrypt"], version = "*"}
+pydantic = {extras = ["email"], version = "*"}
 
 [dev-packages]
 
