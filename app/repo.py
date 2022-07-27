@@ -4,6 +4,7 @@ from fastapi import HTTPException, UploadFile, File, status
 from sqlalchemy.orm import Session
 from . import models, schemas, utils
 import base64
+from sqlalchemy.exc import IntegrityError
 
 # from fastapi import status, Request
 # from fastapi.responses import JSONResponse
@@ -106,7 +107,7 @@ def create_person(db: Session, person, is_author=False):
         parsed = schemas.User(**person.dict())
 
     new_entry = target_table(**parsed.dict(), hashed_password=hashed_pwd)
-
+    
     db.add(new_entry)
     db.commit()
     db.refresh(new_entry)
@@ -140,7 +141,6 @@ def read_person(db: Session, id: int, is_author=False):
 
 def update_password(password: str):
     ...
-
 
 def update_person(db: Session, id, name, email, is_author: bool = False):
     # choose btw author table and user table
@@ -184,8 +184,20 @@ def update_person(db: Session, id, name, email, is_author: bool = False):
     return changed_email, "updated"
 
 
-def delete_person(db: Session):
-    ...
+def delete_person(db: Session, id:int, is_author=False):
+    # choose btw author table and user table
+    target_table = models.Author if is_author else models.User
+    person_type = "Author" if is_author else "User"
+
+    person = db.query(target_table).filter(target_table.id == id)
+
+    if not person.first():
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"{person_type} is unavailable."
+        )
+    person.delete(synchronize_session=False)
+    db.commit()
+    # delete operation does not return value
 
 
 # -----Comments-----

@@ -11,12 +11,22 @@ router = APIRouter(
 
 # create
 @router.post("/{id}", response_model=schemas.User, status_code=status.HTTP_201_CREATED)
-def create_author(*, author: schemas.PersonCreate, db: Session = Depends(get_db)):
+def create_author(
+    *,
+    author: schemas.PersonCreate,
+    db: Session = Depends(get_db),
+    receive_mails: bool = False
+):
     return repo.create_person(db, author, is_author=True)
 
 
 # read all
-@router.get("/", summary="Get All Authors", response_model=list[schemas.Author], status_code=status.HTTP_200_OK)
+@router.get(
+    "/",
+    summary="Get All Authors",
+    response_model=list[schemas.Author],
+    status_code=status.HTTP_200_OK,
+)
 def get_authors(*, db: Session = Depends(get_db), skip: int = 0, limit: int = 100):
     return repo.read_persons(db, skip, limit, is_author=True)
 
@@ -42,3 +52,8 @@ def update_author(
         # add background task to send mail to new email
         ...
     return value
+
+
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_author(*, db: Session = Depends(get_db), id: int):
+    return repo.delete_person(db, id, is_author=True)
