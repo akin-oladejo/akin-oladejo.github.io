@@ -182,11 +182,15 @@ def update_person(db: Session, id, name, email, is_author: bool = False):
         email = email or current_values.email
     )
 
-    person.update(update_values.dict())
-
-    
-
-    db.commit()
+    # attempt changing the email, raise if it already exists
+    try:
+        person.update(update_values.dict())
+        db.commit()
+    except IntegrityError:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail='Email already exists.'
+        )
     return changed_email, "updated"
 
 
