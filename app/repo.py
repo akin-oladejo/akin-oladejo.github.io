@@ -108,9 +108,15 @@ def create_person(db: Session, person, is_author=False):
 
     new_entry = target_table(**parsed.dict(), hashed_password=hashed_pwd)
     
-    db.add(new_entry)
-    db.commit()
-    db.refresh(new_entry)
+    try:
+        db.add(new_entry)
+        db.commit()
+        db.refresh(new_entry)
+    except IntegrityError:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail='Email already exists.'
+        )
     return new_entry
 
 
