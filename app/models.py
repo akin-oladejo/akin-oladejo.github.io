@@ -1,7 +1,16 @@
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, LargeBinary, String
+from sqlalchemy import (
+    Boolean,
+    Column,
+    DateTime,
+    ForeignKey,
+    Integer,
+    LargeBinary,
+    String,
+)
 from sqlalchemy.orm import relationship
 
 from .database import Base
+
 
 class Blog(Base):
     __tablename__ = "blogs"
@@ -12,10 +21,21 @@ class Blog(Base):
     pub_datetime = Column(DateTime)
     latest_update = Column(DateTime)
     thumbnail = Column(LargeBinary, index=True)
-    writer_id = Column(Integer, ForeignKey("users.id"))
-    
+    writer_id = Column(Integer, ForeignKey("authors.id"))
+
     # comments = relationship(Integer, ForeignKey)
-    writer = relationship('User', back_populates='blogs')
+    writer = relationship("Author", back_populates="blogs")
+
+
+class Author(Base):
+    __tablename__ = "authors"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, index=True)
+    email = Column(String, unique=True, index=True)
+    hashed_password = Column(String)
+
+    blogs = relationship("Blog", back_populates="writer")
 
 
 class User(Base):
@@ -25,15 +45,13 @@ class User(Base):
     name = Column(String, index=True)
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
-    is_author = Column(Boolean)
 
-    blogs = relationship('Blog', back_populates='writer')
 
 # class Comments(Base):
 #     __tablename__ = 'comments'
 
-#     writer = 
-#     blog_post = 
+#     writer =
+#     blog_post =
 #     pub_datetime = Column(DateTime)
 
-#     blog_post 
+#     blog_post

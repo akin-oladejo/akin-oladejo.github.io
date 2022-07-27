@@ -1,13 +1,11 @@
 from fastapi import APIRouter, Depends, UploadFile, Form, status, HTTPException
-from .. import schemas, repo, models
+from .. import schemas, repo, utils
 from sqlalchemy.orm import Session
-from fastapi.encoders import jsonable_encoder
-import base64
-from ..app_exceptions import UploadFormatException
+from ..utils import UploadFormatException
 
 router = APIRouter(tags=["blog"], prefix="/blog")
 
-get_db = repo.get_db
+get_db = utils.get_db
 
 
 @router.post("/", response_model=schemas.ShowBlog, status_code=status.HTTP_201_CREATED)
@@ -56,6 +54,10 @@ async def update_post(
     body: str = Form(default=None),
     thumbnail: UploadFile | None = None,
 ):
+    '''
+    Perform `PUT` and `PATCH` operations.  
+    When you use this endpoint, the `latest_update` field gets populated
+    '''
     # convert the thumbnail to bytes
     if thumbnail:
         if thumbnail.content_type not in ["image/jpeg", "image/png"]:

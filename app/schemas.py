@@ -1,16 +1,32 @@
 from datetime import datetime
 from fastapi import UploadFile
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, EmailStr, Field, validator
+import string
 
 
-class UserPlain(BaseModel):
+class PersonPlain(BaseModel):
     name: str
 
-class UserBase(UserPlain):
-    email: str
+class PersonBase(PersonPlain):
+    email: EmailStr
 
-class UserCreate(UserBase):
+class PersonCreate(PersonBase):
     password: str
+    # password: str = Field(min_length=8) # make password at least 8 chars
+
+    # # make sure password contains a number and a special character
+    # @validator('password')
+    # def validate_password(cls, value):
+    #     contains_special = False # flag special symbol is present
+    #     contains_number = False # flag that number is present
+        
+    #     for i in value:
+    #         if i in list(string.punctuation): contains_special = True
+    #         if i in ['0','1','2','3','4','5','6','7','8','9']: contains_number = True
+    #     print(f'{contains_number=}\n{contains_special=}')
+    #     if contains_special and contains_number:
+    #         return value
+    #     raise ValueError('Password needs to contain at least one special character and number')
 
 class BlogBase(BaseModel):
     title: str 
@@ -23,33 +39,32 @@ class BlogCreate(BlogBase):
 class BlogUpdate(BlogBase):
     latest_update : datetime = Field(default_factory=datetime.now)
     
-class User(UserBase):
-    hashed_password: str
-    is_author: bool
-    blogs: list[BlogBase]
+class Author(PersonBase):
+    blogs: list[BlogBase] = []
 
     class Config:
         orm_mode = True
+        
+class User(PersonBase):
+    ...
 
-# class CommentBase(BaseModel):
-#     author: UserPlain
-#     comment: str
-
-# class CommentDB(CommentBase):
-#     pub_datetime: datetime = Field(default_factory=datetime.now)    
-    
+    class Config:
+        orm_mode = True
 
 class ShowBlog(BlogBase):
     id: int | None
     pub_datetime: datetime | None
     latest_update: datetime | None
-    # writer_id: UserBase
+    # writer: PersonBase
     # comments: list[CommentDB]
 
     class Config:
         orm_mode = True
 
+# class CommentBase(BaseModel):
+#     author: PersonPlain
+#     comment: str
 
+# class CommentDB(CommentBase):
+#     pub_datetime: datetime = Field(default_factory=datetime.now)    
     
-
-
