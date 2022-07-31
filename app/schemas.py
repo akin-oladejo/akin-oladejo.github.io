@@ -68,3 +68,11 @@ class ShowBlog(BlogBase):
 # class CommentDB(CommentBase):
 #     pub_datetime: datetime = Field(default_factory=datetime.now)    
     
+class Token(BaseModel):
+    access_token:str
+    token_type: str
+
+class TokenData(BaseModel):
+    id: int
+    email: EmailStr
+    person_type: str

@@ -1,13 +1,11 @@
 # this file houses all crud logic
 
-from fastapi import HTTPException, UploadFile, File, status
+from fastapi import HTTPException, status
+from pydantic import EmailStr
 from sqlalchemy.orm import Session
 from . import models, schemas, utils
 import base64
 from sqlalchemy.exc import IntegrityError
-
-# from fastapi import status, Request
-# from fastapi.responses import JSONResponse
 
 get_db = utils.get_db
 
@@ -107,15 +105,14 @@ def create_person(db: Session, person, is_author=False):
         parsed = schemas.User(**person.dict())
 
     new_entry = target_table(**parsed.dict(), hashed_password=hashed_pwd)
-    
+
     try:
         db.add(new_entry)
         db.commit()
         db.refresh(new_entry)
     except IntegrityError:
         raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail='Email already exists.'
+            status_code=status.HTTP_409_CONFLICT, detail="Email already exists."
         )
     return new_entry
 
@@ -148,6 +145,7 @@ def read_person(db: Session, id: int, is_author=False):
 def update_password(password: str):
     ...
 
+
 def update_person(db: Session, id, name, email, is_author: bool = False):
     # choose btw author table and user table
     target_table = models.Author if is_author else models.User
@@ -178,8 +176,7 @@ def update_person(db: Session, id, name, email, is_author: bool = False):
 
     # the SQLAlchemy update function needs a dict
     update_values = schemas.PersonBase(
-        name = name or current_values.name,
-        email = email or current_values.email
+        name=name or current_values.name, email=email or current_values.email
     )
 
     # attempt changing the email, raise if it already exists
@@ -188,13 +185,12 @@ def update_person(db: Session, id, name, email, is_author: bool = False):
         db.commit()
     except IntegrityError:
         raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail='Email already exists.'
+            status_code=status.HTTP_409_CONFLICT, detail="Email already exists."
         )
     return changed_email, "updated"
 
 
-def delete_person(db: Session, id:int, is_author=False):
+def delete_person(db: Session, id: int, is_author=False):
     # choose btw author table and user table
     target_table = models.Author if is_author else models.User
     person_type = "Author" if is_author else "User"
@@ -203,11 +199,26 @@ def delete_person(db: Session, id:int, is_author=False):
 
     if not person.first():
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail=f"{person_type} is unavailable."
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"{person_type} is unavailable.",
         )
     person.delete(synchronize_session=False)
     db.commit()
     # delete operation does not return value
+
+
+def resolve_login(db: Session, email: EmailStr, password: str, is_author:bool):
+    # choose btw author table and user table
+    target_table = models.Author if is_author else models.User
+
+    person = db.query(target_table).filter(target_table.email == email).first()
+
+    if not person:
+        return False
+    if not utils.Hash().verify(password, person.hashed_password):
+        return False
+        
+    return person
 
 
 # -----Comments-----
