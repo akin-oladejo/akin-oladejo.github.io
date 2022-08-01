@@ -7,7 +7,7 @@ from . import models, schemas, utils
 import base64
 from sqlalchemy.exc import IntegrityError
 
-get_db = utils.get_db
+# get_db = utils.get_db
 
 # -----Blog posts------
 def create_post(db: Session, title, body, thumbnail):

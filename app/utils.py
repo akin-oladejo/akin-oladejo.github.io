@@ -1,35 +1,17 @@
 # house all utility functions
-from fastapi import HTTPException, status
 from passlib.context import CryptContext
-from . import database, repo
+from . import database, repo, schemas
 import base64
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from datetime import datetime, timedelta
 from dotenv import load_dotenv
+from datetime import datetime, timedelta
 import os
 from jose import JWTError, jwt
+from sqlalchemy.orm import Session
+from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
 
 # load environment variables
 load_dotenv()
-
-# create security dependency
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
-
-
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
-
-# convert environment variable SECRET_KEY to string
-SECRET_KEY = str(os.environ.get("SECRET_KEY"))
-
-def create_access_token(data: dict):
-      
-    to_encode = data.copy()
-    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, key=SECRET_KEY, algorithm=ALGORITHM)
-    return encoded_jwt
-
 
 def get_db():
     """
@@ -40,7 +22,6 @@ def get_db():
         yield db
     finally:
         db.close()
-
 
 class Hash:
     """
@@ -57,7 +38,6 @@ class Hash:
     def verify(self, pwd, hashed_pwd):
         return self.pwd_context.verify(pwd, hashed_pwd)
 
-
 class UploadFormatException(Exception):
     """
     Just a usual exception. The only special thing is I can pass the name of the file
@@ -66,7 +46,6 @@ class UploadFormatException(Exception):
     def __init__(self, file_name: str, error_message: str) -> None:
         self.file_name = file_name
         self.error_message = error_message
-
 
 # I never actually used this class below
 class CustomUpload:
@@ -116,3 +95,50 @@ class CustomUpload:
                 file_name=self.input.filename,
                 error_message="This file was not previously encoded.",
             )
+
+
+# create security dependency
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
+# convert environment variable SECRET_KEY to string
+SECRET_KEY = str(os.environ.get("SECRET_KEY"))
+
+def create_access_token(data: dict):
+    to_encode = data.copy()
+    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, key=SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
+
+def get_current_user(db:Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+         
+        sub = payload.get('sub')
+
+        # the value of sub looks like user:<email> or author:<email>...
+        # ...so I have to break it into the person type and the email
+        
+        person_type, email = sub.split(':')
+        if email == None:
+            raise credentials_exception
+
+        token_data = schemas.TokenData(id=payload.get('id'), email=email, person_type=person_type)
+    except JWTError:
+        raise credentials_exception
+    
+    # set is_author to True if decoded token indicates that the person is an author
+    is_author = False
+    if person_type == 'author': is_author = True 
+    person = repo.read_person(db, id=token_data.id, is_author=is_author)
+    if not person:
+        raise credentials_exception
+    return person
