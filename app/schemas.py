@@ -10,6 +10,9 @@ class PersonPlain(BaseModel):
 class PersonBase(PersonPlain):
     email: EmailStr
 
+    class Config:
+        orm_mode = True
+
 class PersonCreate(PersonBase):
     password: str
     # password: str = Field(min_length=8) # make password at least 8 chars
@@ -31,22 +34,32 @@ class PersonCreate(PersonBase):
 class BlogBase(BaseModel):
     title: str 
     body: str 
-    thumbnail: bytes | None 
+    thumbnail: bytes | None
+    
+    class Config:
+        orm_mode = True 
 
 class BlogCreate(BlogBase):
-    pub_datetime: datetime = Field(default_factory=datetime.now)
+    pub_datetime: datetime = Field(default_factory = datetime.now)
 
 class BlogUpdate(BlogBase):
-    latest_update : datetime = Field(default_factory=datetime.now)
+    latest_update : datetime = Field(default_factory = datetime.now)
     
 class Author(PersonBase):
+    person_type: str = 'author'
     blogs: list[BlogBase] = []
+
+    class Config:
+        orm_mode = True
+
+class AuthorWithID(Author):
+    id: int
 
     class Config:
         orm_mode = True
         
 class User(PersonBase):
-    ...
+    person_type: str = 'user'
 
     class Config:
         orm_mode = True
@@ -55,7 +68,7 @@ class ShowBlog(BlogBase):
     id: int | None
     pub_datetime: datetime | None
     latest_update: datetime | None
-    # writer: PersonBase
+    writer: PersonBase
     # comments: list[CommentDB]
 
     class Config:

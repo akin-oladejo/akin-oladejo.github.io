@@ -10,7 +10,7 @@ from sqlalchemy.exc import IntegrityError
 # get_db = utils.get_db
 
 # -----Blog posts------
-def create_post(db: Session, title, body, thumbnail):
+def create_post(db: Session, title, body, thumbnail, creator_id):
     if thumbnail:
         # encode the thumbnail into a b64 string
         thumbnail = base64.b64encode(thumbnail)
@@ -19,7 +19,7 @@ def create_post(db: Session, title, body, thumbnail):
     new_blog = schemas.BlogCreate(title=title, body=body, thumbnail=thumbnail)
 
     # convert to ORM object
-    new_post = models.Blog(**new_blog.dict())
+    new_post = models.Blog(**new_blog.dict(), writer_id=creator_id)
 
     # save to table
     db.add(new_post)
@@ -93,16 +93,17 @@ def delete_post(db: Session, post_id: int):
 def create_person(db: Session, person, is_author=False):
     # choose btw author table and user table
     target_table = models.Author if is_author else models.User
+    person_class = 'author' if is_author else 'user'
 
     # hash password
     hashed_pwd = utils.Hash(person.password).value
 
     if is_author:
         # use the Author schema for authors
-        parsed = schemas.Author(**person.dict())  # adds a blog attribute
+        parsed = schemas.Author(**person.dict(), person_type=person_class)  # adds a blog attribute
     else:
         # use the User schema for authors
-        parsed = schemas.User(**person.dict())
+        parsed = schemas.User(**person.dict(), person_type=person_class)
 
     new_entry = target_table(**parsed.dict(), hashed_password=hashed_pwd)
 

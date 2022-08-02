@@ -7,7 +7,7 @@ router = APIRouter(tags=["blog"], prefix="/blog")
 
 get_db = utils.get_db
 
-
+# create a single post
 @router.post("/", response_model=schemas.ShowBlog, status_code=status.HTTP_201_CREATED)
 async def create_post(
     *,
@@ -15,6 +15,7 @@ async def create_post(
     title: str = Form(default="default value to be set to required later"),
     body: str = Form(default="default value to be set to required later"),
     thumbnail: UploadFile | None = None,
+    creator_id:int = Depends(utils.confirm_author)
 ):
     if thumbnail:
         if thumbnail.content_type not in ["image/jpeg", "image/png"]:
@@ -26,9 +27,9 @@ async def create_post(
             thumbnail = await thumbnail.read()
 
     # call the create_post function
-    return repo.create_post(db=db, title=title, body=body, thumbnail=thumbnail)
+    return repo.create_post(db=db, title=title, body=body, thumbnail=thumbnail, creator_id=creator_id)
 
-
+# get all blog posts
 @router.get(
     "/",
     summary="Get All Blog Posts",

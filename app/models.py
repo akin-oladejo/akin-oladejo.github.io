@@ -33,6 +33,7 @@ class Author(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
     email = Column(String, unique=True, index=True)
+    person_type = Column(String)
     hashed_password = Column(String)
 
     blogs = relationship("Blog", back_populates="writer")
@@ -44,6 +45,7 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
     email = Column(String, unique=True, index=True)
+    person_type = Column(String)
     hashed_password = Column(String)
 
 

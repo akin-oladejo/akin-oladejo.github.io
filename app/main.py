@@ -54,6 +54,6 @@ def upload_format_handler(request:Request, exc: UploadFormatException):
 def home():
     return {'message':'hello world'}
 
-@app.get('/me', tags=['base'], response_model=schemas.Author)
-def read_me(current_user: schemas.Author = Depends(utils.get_current_user)):
+@app.get('/me', tags=['base'], response_model=schemas.AuthorWithID)
+def read_me(current_user: schemas.Author = Depends(utils.get_current_person)):
     return current_user

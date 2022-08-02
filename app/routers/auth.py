@@ -13,7 +13,7 @@ router = APIRouter(tags=['auth'])
 
     
 @router.post('/token', response_model=schemas.Token)
-def login_for_token(db:Session = Depends(get_db), form_data: OAuth2PasswordRequestForm = Depends(), is_author:bool = False):
+def login_for_token(db:Session = Depends(get_db), form_data: OAuth2PasswordRequestForm = Depends(), is_author:bool = True):
     person = repo.resolve_login(db, form_data.username, form_data.password, is_author)
     
     if not person:

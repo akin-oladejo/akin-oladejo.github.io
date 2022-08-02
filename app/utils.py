@@ -113,7 +113,7 @@ def create_access_token(data: dict):
     encoded_jwt = jwt.encode(to_encode, key=SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
-def get_current_user(db:Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
+def get_current_person(db:Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -142,3 +142,15 @@ def get_current_user(db:Session = Depends(get_db), token: str = Depends(oauth2_s
     if not person:
         raise credentials_exception
     return person
+
+def confirm_author(person:schemas.AuthorWithID = Depends(get_current_person)):
+    if person.person_type == 'user':
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail='This operation requires an author.'
+        )
+    return person.id
+
+def restrict_author(user_id, post_id):
+    # write code to raise exception if another author tries to modify someone else's post or data
+    ...
