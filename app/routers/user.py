@@ -10,7 +10,7 @@ router = APIRouter(
 )
 
 
-@router.post("/{id}", response_model=schemas.User, status_code=status.HTTP_201_CREATED)
+@router.post("/{user_id}", response_model=schemas.User, status_code=status.HTTP_201_CREATED)
 def create_user(
     *,
     user: schemas.PersonCreate,
@@ -31,13 +31,13 @@ def get_users(*, db: Session = Depends(get_db), skip: int = 0, limit: int = 100)
     return repo.read_persons(db, skip, limit)
 
 
-@router.get("/{id}", response_model=schemas.User, status_code=status.HTTP_200_OK)
+@router.get("/{user_id}", response_model=schemas.User, status_code=status.HTTP_200_OK)
 def get_user(*, db: Session = Depends(get_db), id: int):
     user = repo.read_person(db, id)
     return user
 
 
-@router.put("/{id}", status_code=status.HTTP_202_ACCEPTED)
+@router.put("/{user_id}", status_code=status.HTTP_202_ACCEPTED)
 def update_user(
     *,
     db: Session = Depends(get_db),
@@ -52,6 +52,6 @@ def update_user(
     return value
 
 
-@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_user(*, db: Session = Depends(get_db), id: int):
     return repo.delete_person(db, id)

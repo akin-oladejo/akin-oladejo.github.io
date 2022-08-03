@@ -27,11 +27,11 @@ def login_for_token(db:Session = Depends(get_db), form_data: OAuth2PasswordReque
     # ...else, prefix it with 'user:'
     if is_author:
         access_token = utils.create_access_token(
-            data={'sub':f'author:{person.email}', 'id':person.id}
+            data={'sub':f'author:{person.email}', 'author_id':person.author_id}
         )
     else:
         access_token = utils.create_access_token(
-            data={'sub':f'user:{person.email}', 'id':person.id}
+            data={'sub':f'user:{person.email}', 'user_id':person.user_id}
         )
     return {'access_token':access_token, 'token_type':'bearer'}
 

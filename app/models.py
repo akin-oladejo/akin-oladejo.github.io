@@ -1,5 +1,4 @@
 from sqlalchemy import (
-    Boolean,
     Column,
     DateTime,
     ForeignKey,
@@ -15,13 +14,13 @@ from .database import Base
 class Blog(Base):
     __tablename__ = "blogs"
 
-    id = Column(Integer, primary_key=True, index=True)
+    post_id = Column(Integer, primary_key=True, index=True)
     title = Column(String, index=True)
     body = Column(String, index=True)
     pub_datetime = Column(DateTime)
     latest_update = Column(DateTime)
     thumbnail = Column(LargeBinary, index=True)
-    writer_id = Column(Integer, ForeignKey("authors.id"))
+    writer_id = Column(Integer, ForeignKey("authors.author_id"))
 
     # comments = relationship(Integer, ForeignKey)
     writer = relationship("Author", back_populates="blogs")
@@ -30,7 +29,7 @@ class Blog(Base):
 class Author(Base):
     __tablename__ = "authors"
 
-    id = Column(Integer, primary_key=True, index=True)
+    author_id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
     email = Column(String, unique=True, index=True)
     person_type = Column(String)
@@ -42,7 +41,7 @@ class Author(Base):
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
     email = Column(String, unique=True, index=True)
     person_type = Column(String)

@@ -37,7 +37,7 @@ def read_all_posts(db: Session, skip: int = 0, limit: int = 10):
 
 
 def read_post(db: Session, post_id):
-    post = db.query(models.Blog).filter(models.Blog.id == post_id).first()
+    post = db.query(models.Blog).filter(models.Blog.post_id == post_id).first()
 
     if post is None:
         raise HTTPException(
@@ -51,7 +51,7 @@ def read_post(db: Session, post_id):
 
 def update_post(db: Session, post_id: int, title, body, thumbnail):
     # fetch post in db using post_id
-    post = db.query(models.Blog).filter(models.Blog.id == post_id)
+    post = db.query(models.Blog).filter(models.Blog.post_id == post_id)
 
     # handle unavailable post
     if not post.first():
@@ -79,7 +79,7 @@ def update_post(db: Session, post_id: int, title, body, thumbnail):
 
 
 def delete_post(db: Session, post_id: int):
-    post = db.query(models.Blog).filter(models.Blog.id == post_id)
+    post = db.query(models.Blog).filter(models.Blog.post_id == post_id)
     if not post.first():
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail=f"Blogpost is unavailable."
@@ -132,7 +132,10 @@ def read_person(db: Session, id: int, is_author=False):
     target_table = models.Author if is_author else models.User
     person_type = "Author" if is_author else "User"
 
-    person = db.query(target_table).filter(id == target_table.id).first()
+    if is_author:
+        person = db.query(target_table).filter(id == target_table.author_id).first()
+    else:
+        person = db.query(target_table).filter(id == target_table.user_id).first()
 
     if person is None:
         raise HTTPException(
@@ -153,7 +156,10 @@ def update_person(db: Session, id, name, email, is_author: bool = False):
     person_type = "Author" if is_author else "User"
 
     # fetch post in db using post_imodels.Blogd
-    person = db.query(target_table).filter(target_table.id == id)
+    if is_author:
+        person = db.query(target_table).filter(id == target_table.author_id)
+    else:
+        person = db.query(target_table).filter(id == target_table.user_id)
 
     # handle unavailable post
     if not person.first():
@@ -196,7 +202,10 @@ def delete_person(db: Session, id: int, is_author=False):
     target_table = models.Author if is_author else models.User
     person_type = "Author" if is_author else "User"
 
-    person = db.query(target_table).filter(target_table.id == id)
+    if is_author:
+        person = db.query(target_table).filter(id == target_table.author_id)
+    else:
+        person = db.query(target_table).filter(id == target_table.user_id)
 
     if not person.first():
         raise HTTPException(

@@ -10,7 +10,7 @@ router = APIRouter(
 )
 
 # create
-@router.post("/{id}", response_model=schemas.User, status_code=status.HTTP_201_CREATED)
+@router.post("/{author_id}", response_model=schemas.User, status_code=status.HTTP_201_CREATED)
 def create_author(
     *,
     author: schemas.PersonCreate,
@@ -32,14 +32,14 @@ def get_authors(*, db: Session = Depends(get_db), skip: int = 0, limit: int = 10
 
 
 # read single
-@router.get("/{id}", response_model=schemas.Author, status_code=status.HTTP_200_OK)
+@router.get("/{author_id}", response_model=schemas.Author, status_code=status.HTTP_200_OK)
 def get_author(*, db: Session = Depends(get_db), id: int):
     author = repo.read_person(db, id, is_author=True)
     return author
 
 
 # update single
-@router.put("/{id}", status_code=status.HTTP_202_ACCEPTED)
+@router.put("/{author_id}", status_code=status.HTTP_202_ACCEPTED)
 def update_author(
     *,
     db: Session = Depends(get_db),
@@ -54,6 +54,6 @@ def update_author(
     return value
 
 
-@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{author_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_author(*, db: Session = Depends(get_db), id: int):
     return repo.delete_person(db, id, is_author=True)

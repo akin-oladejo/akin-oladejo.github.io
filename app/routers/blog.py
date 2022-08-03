@@ -39,14 +39,14 @@ async def create_post(
 def read_all_posts(db: Session = Depends(get_db), skip: int = 0, limit: int = 10):
     return repo.read_all_posts(db, skip, limit)
 
-
-@router.get("/{id}", summary="Get Single Blog Post", status_code=status.HTTP_200_OK, response_model=schemas.ShowBlog)
+# get single blog post
+@router.get("/{post_id}", summary="Get Single Blog Post", status_code=status.HTTP_200_OK, response_model=schemas.ShowBlog)
 def read_post(*, db: Session = Depends(get_db), post_id: int):
     post = repo.read_post(db, post_id)
     return post
 
-
-@router.put("/{id}", status_code=status.HTTP_202_ACCEPTED)
+# update single post
+@router.put("/{post_id}", status_code=status.HTTP_202_ACCEPTED)
 async def update_post(
     *,
     db: Session = Depends(get_db),
@@ -54,11 +54,15 @@ async def update_post(
     title: str = Form(default=None),
     body: str = Form(default=None),
     thumbnail: UploadFile | None = None,
+    requester_id:int = Depends(utils.confirm_author)
 ):
     '''
     Perform `PUT` and `PATCH` operations.  
     When you use this endpoint, the `latest_update` field gets populated
     '''
+    # ensure that changes are restricted to the author of the post
+    utils.restrict_author(db, requester_id=requester_id, post_id=post_id)
+
     # convert the thumbnail to bytes
     if thumbnail:
         if thumbnail.content_type not in ["image/jpeg", "image/png"]:
@@ -72,6 +76,13 @@ async def update_post(
     return repo.update_post(db, post_id, title, body, thumbnail)
 
 
-@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_post(*, db: Session = Depends(get_db), post_id: int):
+@router.delete("/{post_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_post(*,
+                db: Session = Depends(get_db), 
+                post_id: int,
+                requester_id:int = Depends(utils.confirm_author)
+                ):
+    # ensure that changes are restricted to the author of the post
+    utils.restrict_author(db, requester_id=requester_id, post_id=post_id)
+
     return repo.delete_post(db, post_id)

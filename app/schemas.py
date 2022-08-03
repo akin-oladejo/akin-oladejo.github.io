@@ -13,6 +13,12 @@ class PersonBase(PersonPlain):
     class Config:
         orm_mode = True
 
+class ShowAuthor(PersonBase):
+    author_id: int
+
+    class Config:
+        orm_mode = True
+
 class PersonCreate(PersonBase):
     password: str
     # password: str = Field(min_length=8) # make password at least 8 chars
@@ -53,7 +59,7 @@ class Author(PersonBase):
         orm_mode = True
 
 class AuthorWithID(Author):
-    id: int
+    author_id: int | None
 
     class Config:
         orm_mode = True
@@ -65,10 +71,10 @@ class User(PersonBase):
         orm_mode = True
 
 class ShowBlog(BlogBase):
-    id: int | None
+    post_id: int | None
     pub_datetime: datetime | None
     latest_update: datetime | None
-    writer: PersonBase
+    writer: ShowAuthor
     # comments: list[CommentDB]
 
     class Config:

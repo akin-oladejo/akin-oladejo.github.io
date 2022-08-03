@@ -131,13 +131,19 @@ def get_current_person(db:Session = Depends(get_db), token: str = Depends(oauth2
         if email == None:
             raise credentials_exception
 
-        token_data = schemas.TokenData(id=payload.get('id'), email=email, person_type=person_type)
+        # # set is_author to True if decoded token indicates that the person is an author
+        is_author = False
+
+        if person_type == 'author': 
+            is_author = True
+            token_data = schemas.TokenData(id=payload.get('author_id'), email=email, person_type=person_type)
+        else:
+            token_data = schemas.TokenData(id=payload.get('user_id'), email=email, person_type=person_type)
     except JWTError:
         raise credentials_exception
     
-    # set is_author to True if decoded token indicates that the person is an author
-    is_author = False
-    if person_type == 'author': is_author = True 
+    
+     
     person = repo.read_person(db, id=token_data.id, is_author=is_author)
     if not person:
         raise credentials_exception
@@ -149,8 +155,15 @@ def confirm_author(person:schemas.AuthorWithID = Depends(get_current_person)):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail='This operation requires an author.'
         )
-    return person.id
+    author_id = id
+    return person.author_id
 
-def restrict_author(user_id, post_id):
-    # write code to raise exception if another author tries to modify someone else's post or data
-    ...
+def restrict_author(db, requester_id, post_id):
+    # raise exception if another author tries to modify someone else's post or data
+    post = repo.read_post(db, post_id=post_id)
+
+    if post.writer.author_id != requester_id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f'You do not have permission to effect this change.'
+        )
