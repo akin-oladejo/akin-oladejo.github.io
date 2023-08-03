@@ -6,3 +6,4 @@ sample-logo.png
 app.db
 template
 .env
+dump/
