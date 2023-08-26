@@ -121,7 +121,7 @@ self.action_to_angle = {
     8:45
   }
 </pre>
-      The attribute `action_to_angle` will serve as a lookup for converting supplied action values to angles.
+      The attribute <code>action_to_angle</code> will serve as a lookup for converting supplied action values to angles.
       <h2>The reward scheme</h2>
       <P>Since Q-learning is a value-based algorithm and obtains its policy indirectly using an action-value table, we
         need to come up with a scheme to encourage choosing the right angle. </P>
@@ -232,15 +232,15 @@ def new_target(self):
     
 
 def get_obs(self, verbose=False):
-  <span class="comment"># self.target = self.observation_space.sample() # generate random target</span>
-  self.state = self.target_to_state[self.target] <span class="comment"># represent target as state</span>
+    <span class="comment"># self.target = self.observation_space.sample() # generate random target</span>
+    self.state = self.target_to_state[self.target] <span class="comment"># represent target as state</span>
 
-  <span class="comment"># if verbose=True, return the true value of the target distance, else return </span>
-  <span class="comment"># its representation as a state value</span>
-  if verbose:
-      return f'Target distance: {self.target}m'
-  else:
-      return self.state
+    <span class="comment"># if verbose=True, return the true value of the target distance, else return </span>
+    <span class="comment"># its representation as a state value</span>
+    if verbose:
+        return f'Target distance: {self.target}m'
+    else:
+        return self.state
 
 
 def get_info(self, verbose=True):
@@ -273,248 +273,258 @@ def reset(self, verbose=True):
       <p>The range (also known as horizontal distance) of the projectile is calculated using the standard formula for
         a projectile's range, assuming no air resistance and that the final height of the projectile is equal to its
         initial height:
-        <img src="/images/projectile range formula.png" alt="Formula for the range of a projectile">
+        <img src="../pics/projectile range formula.png" alt="Formula for the range of a projectile">
         The angle, θ, is converted to radians from degrees.
       </p>
-      <pre>
-  def calc_range(self):
-      <span class="comment"># calculate the range of the projectile using the relation v²·sin(2θ)/g</span>
-      rad = np.pi/180 * angle
-      range = (v**2) * np.sin(2 * rad) / g
-      return range
-  </pre>
-      <h2>Step</h2>
-      <p>Calling <code>step</code> decrements <code>current_countdown</code> by 1. It takes an action value and
-        calculates the range by calling <code>calc_range()</code>. The error is computed using
-        <code>get_info()</code>.
-      </p>
-      <p>The reward is calculated using the scheme above. If the <code>current_countdown</code> is 0, a new target
-        value is generated using <code>new_target</code> and <code>current_countdown</code> is reinitialized to the
-        value of <code>max_repeat</code>. Once we run out of target values, <code>done</code> is set to
-        <code>True</code>, ending the episode.
-      </p>
-      <pre>
-  def step(self, action):
-      <span class="comment"># print(target_list)</span>
-      <span class="comment"># reduce the target repeat countdown by 1</span>
-      current_countdown -= 1
-  
-      <span class="comment"># map the action to the angle of projectile</span>
-      angle = action_to_angle[action]
-  
-      <span class="comment"># this is the range covered by the projectile at the given angle, save it in the </span>
-      <span class="comment"># lookup table for current ranges</span>
-      range = calc_range()
-  
-      <span class="comment"># evaluate error for this round</span>
-      error = get_info(verbose=False) 
-  
-      <span class="comment"># if the error in this round is less than the history of errors for this round, the </span>
-      <span class="comment"># reward is set to +1. If it is higher, -1. Else, the reward is 0</span>
-      if error < min_error[target]:
-          reward = 1 
-          min_error[target] = error <span class="comment"># update error range value</span>
-      elif error > min_error[target]:
-          reward = -1
-      elif error == min_error[target]:
-          reward = 0
-  
-      if current_countdown == 0:
-          if len(target_list) == 0:
-              <span class="comment"># set done to True when there are no values left in target_list and end episode</span>
-              done = True
-          else:
-              <span class="comment"># else supply a new target and start the repeat counter again</span>
-              new_target()
-              current_countdown = max_repeat
-      
-      return get_obs(), reward, done, get_info()
-  </pre>
+
+
+<pre>
+def calc_range(self):
+    <span class="comment"># calculate the range of the projectile using the relation v²·sin(2θ)/g</span>
+    rad = np.pi/180 * angle
+    range = (v**2) * np.sin(2 * rad) / g
+    return range
+</pre>
+
+    <h2>Step</h2>
+    <p>Calling <code>step</code> decrements <code>current_countdown</code> by 1. It takes an action value and
+      calculates the range by calling <code>calc_range()</code>. The error is computed using
+      <code>get_info()</code>.
+    </p>
+    <p>The reward is calculated using the scheme above. If the <code>current_countdown</code> is 0, a new target
+      value is generated using <code>new_target</code> and <code>current_countdown</code> is reinitialized to the
+      value of <code>max_repeat</code>. Once we run out of target values, <code>done</code> is set to
+      <code>True</code>, ending the episode.
+    </p>
+
+
+<pre>
+def step(self, action):
+    <span class="comment"># print(target_list)</span>
+    <span class="comment"># reduce the target repeat countdown by 1</span>
+    current_countdown -= 1
+
+    <span class="comment"># map the action to the angle of projectile</span>
+    angle = action_to_angle[action]
+
+    <span class="comment"># this is the range covered by the projectile at the given angle, save it in the </span>
+    <span class="comment"># lookup table for current ranges</span>
+    range = calc_range()
+
+    <span class="comment"># evaluate error for this round</span>
+    error = get_info(verbose=False) 
+
+    <span class="comment"># if the error in this round is less than the history of errors for this round, the </span>
+    <span class="comment"># reward is set to +1. If it is higher, -1. Else, the reward is 0</span>
+    if error < min_error[target]:
+        reward = 1 
+        min_error[target] = error <span class="comment"># update error range value</span>
+    elif error > min_error[target]:
+        reward = -1
+    elif error == min_error[target]:
+        reward = 0
+
+    if current_countdown == 0:
+        if len(target_list) == 0:
+            <span class="comment"># set done to True when there are no values left in target_list and end episode</span>
+            done = True
+        else:
+            <span class="comment"># else supply a new target and start the repeat counter again</span>
+            new_target()
+            current_countdown = max_repeat
+    
+    return get_obs(), reward, done, get_info()</pre>
+
+
       <h2>Rendering</h2>
       <code>render()</code> contains the logic to visualize the target, range and error, using the <code>numpy</code>
       library to calculate displacement values and <code>matplotlib</code> library for visualization.
-      <pre>
-  def render(target, angle):
-      v, g = 15, 9.8 <span class="comment"># initialize velocity and acceleration due to gravity</span>
-      rad = np.pi/180 * angle
-      plt.figure()
-      params = {'mathtext.default': 'regular' }  <span class="comment"># mathtext, for subscripting 0 in v0 in plot title</span>
-      tmax = (2 * v) * np.sin(rad) / g <span class="comment"># calculate time of flight</span>
-      t = tmax*np.linspace(0,1,100) <span class="comment"># divide time of flight into 100 uniform time steps</span>
-      x = ((v * t) * np.cos(rad)) <span class="comment"># horizontal distance at each time step</span>
-      y = ((v * t) * np.sin(rad)) - ((0.5 * g) * (t ** 2)) <span class="comment"># vertical distance </span>
-  
-      plt.plot(x, y, color='g') <span class="comment"># plot path</span>
-  
-      <span class="comment"># draw line to target target (i.e desired distance) saved in `target`</span>
-      plt.axvline(x = target, ls='--', color = 'b', label = f'target: {target}m') 
-  
-      <span class="comment"># draw projectile at final coordinates</span>
-      plt.scatter(x[-1], y[-1], color='r', markerinitial_velocity="^", s=200)
-  
-      plt.ylim([0,10])
-      plt.xlim(left=0)
-      plt.title(f'$v_{0}$ = {v}m/s, θ = {angle}°, abs. error = {np.abs(x[-1]-target):.2f}m')
-      plt.legend()
-  </pre>
-      <pre>
-  render(target=15, angle=30)
-  </pre>
-      <img src="/images/projectile plot.png" alt="Projectile plot">
-      <h2>Putting it all together in a class: <code>Projectile</code></h2>
-      <pre>
-  class Projectile(Env):
-      def __init__(self, initial_velocity=15, g=9.8, target_low=3, target_high=22, max_repeat=9):
-          self.name = 'Projectile'
-          <span class="comment"># define environment bounds</span>
-          self.observation_space = Box(low=target_low, high=target_high, shape=(1,), dtype=np.int32)
-  
-          <span class="comment"># there are 9 actions corresponding to the interval of angles from 5 to 45</span>
-          self.action_space = Discrete(9)
-  
-          <span class="comment"># store these for easy access later</span>
-          self.n_actions = self.action_space.n
-          self.n_states = target_high - target_low + 1
-  
-          self.v = initial_velocity <span class="comment"># the default value for initial_velocity is 15m/s</span>
-          self.g = g <span class="comment"># the default value for acceleration due to gravity is 9.8m/s²</span>
-          
-          <span class="comment"># the number of times to repeat a target value before moving on to the next</span>
-          self.max_repeat = max_repeat 
-  
-          <span class="comment"># lookup the angle values for each action</span>
-          self.action_to_angle = {
-              0:5,
-              1:10,
-              2:15,
-              3:20,
-              4:25, 
-              5:30, 
-              6:35, 
-              7:40,
-              8:45
-          }
-  
-          <span class="comment"># create a lookup of discrete state values corresponding to target distances</span>
-          self.target_to_state = {i:x for x,i in enumerate((range(target_low, target_high+1)))}
-  
-          <span class="comment"># keep track of the lowest error attained for each target</span>
-          self.min_error = {x:np.inf for x in range(self.observation_space.low[0], self.observation_space.high[0] + 1)} 
-  
-  
-      def new_target(self):
-          <span class="comment"># pick a target from the list of targets and remove it </span>
-          self.target = self.target_list.pop()
-          
-  
-      def get_obs(self, verbose=False):
-          <span class="comment"># self.target = self.observation_space.sample() # generate random target</span>
-          self.state = self.target_to_state[self.target] <span class="comment"># represent target as state</span>
-  
-          <span class="comment"># if verbose=True, return the true value of the target distance, else return </span>
-          <span class="comment"># its representation as a state value</span>
-          if verbose:
-              return f'Target distance: {self.target}m'
-          else:
-              return self.state
-  
-  
-      def get_info(self, verbose=True):
-          <span class="comment"># return the number of meters by which we've missed the target</span>
-          self.error = np.abs(self.target - self.range) <span class="comment"># absolute error</span>
-  
-          <span class="comment"># if verbose=True, return a full sentence, else just return the value of the error</span>
-          if verbose:
-              return f'Error: {self.error:.2f}m'
-          else:
-              return self.error
-  
-      def reset(self, verbose=True):
-          <span class="comment"># store the set of targets we can select from </span>
-          self.target_list = list(range(self.observation_space.low[0], self.observation_space.high[0] + 1))
-  
-          random.shuffle(self.target_list) <span class="comment"># shuffle the available targets</span>
-          self.new_target() <span class="comment"># generate a target value</span>
-          self.range = 0 <span class="comment"># the projectile is yet to be shot, so range is still 0</span>
-          self.current_countdown = self.max_repeat <span class="comment"># start the countdown for the current target</span>
-          self.done = False
-  
-          return self.get_obs(verbose), self.get_info()
-  
-  
-      def calc_range(self):
-          <span class="comment"># calculate the range of the projectile using the relation v²·sin(2θ)/g</span>
-          rad = np.pi/180 * self.angle
-          range = (self.v**2) * np.sin(2 * rad) / self.g
-          return range
-  
-      def step(self, action):
-          <span class="comment"># print(self.target_list)</span>
-          <span class="comment"># reduce the target repeat countdown by 1</span>
-          self.current_countdown -= 1
-  
-          <span class="comment"># map the action to the angle of projectile</span>
-          self.angle = self.action_to_angle[action]
-  
-          <span class="comment"># this is the range covered by the projectile at the given angle, save it in the </span>
-          <span class="comment"># lookup table for current ranges</span>
-          self.range = self.calc_range()
-  
-          <span class="comment"># evaluate error for this round</span>
-          self.error = self.get_info(verbose=False) 
-  
-          <span class="comment"># if the error in this round is less than the history of errors for this round, the </span>
-          <span class="comment"># reward is set to +1. If it is higher, -1. Else, the reward is 0</span>
-          if self.error < self.min_error[self.target]:
-              self.reward = 1 
-              self.min_error[self.target] = self.error <span class="comment"># update error range value</span>
-          elif self.error > self.min_error[self.target]:
-              self.reward = -1
-          elif self.error == self.min_error[self.target]:
-              self.reward = 0
-  
-          if self.current_countdown == 0:
-              if len(self.target_list) == 0:
-                  <span class="comment"># set self.done to True when there are no values left in self.target_list and end episode</span>
-                  self.done = True
-              else:
-                  <span class="comment"># else supply a new target and start the repeat counter again</span>
-                  self.new_target()
-                  self.current_countdown = self.max_repeat
-          
-          return self.get_obs(), self.reward, self.done, self.get_info()
-          
-  
-      def render(self):
-          rad = np.pi/180 * self.angle
-          plt.figure()
-          <span class="comment"># plt.clf()</span>
-          params = {'mathtext.default': 'regular' }  <span class="comment"># mathtext, for subscripting 0 in v0 in plot title</span>
-          tmax = (2 * self.v) * np.sin(rad) / self.g <span class="comment"># calculate time of flight</span>
-          t = tmax*np.linspace(0,1,100) <span class="comment"># divide time of flight into 100 uniform time steps</span>
-          self.x = ((self.v * t) * np.cos(rad)) <span class="comment"># horizontal distance at each time step</span>
-          self.y = ((self.v * t) * np.sin(rad)) - ((0.5 * self.g) * (t ** 2)) <span class="comment"># vertical distance </span>
-  
-          plt.plot(self.x, self.y, color='g') <span class="comment"># plot path</span>
-  
-          <span class="comment"># draw line to target target (i.e desired distance) saved in `self.target`</span>
-          plt.axvline(x = self.target, ls='--', color = 'b', label = f'target: {self.target}m') 
-  
-          <span class="comment"># draw projectile at final coordinates</span>
-          plt.scatter(self.x[-1], self.y[-1], color='r', marker="^", s=200)
-  
-          plt.ylim([0,10])
-          plt.xlim(left=0)
-          plt.title(f'$v_{0}$ = {self.v}m/s, θ = {self.angle}°, abs. error = {np.abs(self.x[-1]-self.target):.2f}m')
-          plt.legend()
       
-      def __repr__(self):
-          return f'''Projectile environment: 
-                     Initial velocity: {self.v}m/s
-                     Acceleration due to gravity: {self.g}m/s²
-                     Available angles in degrees:{list(self.action_to_angle.values())}'''
-  </pre>
-      <h1>Solving this environment using the <code>Q</code> class</h1>
+      
+<pre>
+def render(target, angle):
+    v, g = 15, 9.8 <span class="comment"># initialize velocity and acceleration due to gravity</span>
+    rad = np.pi/180 * angle
+    plt.figure()
+    params = {'mathtext.default': 'regular' }  <span class="comment"># mathtext, for subscripting 0 in v0 in plot title</span>
+    tmax = (2 * v) * np.sin(rad) / g <span class="comment"># calculate time of flight</span>
+    t = tmax*np.linspace(0,1,100) <span class="comment"># divide time of flight into 100 uniform time steps</span>
+    x = ((v * t) * np.cos(rad)) <span class="comment"># horizontal distance at each time step</span>
+    y = ((v * t) * np.sin(rad)) - ((0.5 * g) * (t ** 2)) <span class="comment"># vertical distance </span>
+
+    plt.plot(x, y, color='g') <span class="comment"># plot path</span>
+
+    <span class="comment"># draw line to target target (i.e desired distance) saved in `target`</span>
+    plt.axvline(x = target, ls='--', color = 'b', label = f'target: {target}m') 
+
+    <span class="comment"># draw projectile at final coordinates</span>
+    plt.scatter(x[-1], y[-1], color='r', markerinitial_velocity="^", s=200)
+
+    plt.ylim([0,10])
+    plt.xlim(left=0)
+    plt.title(f'$v_{0}$ = {v}m/s, θ = {angle}°, abs. error = {np.abs(x[-1]-target):.2f}m')
+    plt.legend()</pre>
+
+
+<pre>render(target=15, angle=30)</pre>
+
+      <img src="../pics/projectile plot.png" alt="Projectile plot">
+      <h2>Putting it all together in a class: <code>Projectile</code></h2>
+
+<pre>
+class Projectile(Env):
+    def __init__(self, initial_velocity=15, g=9.8, target_low=3, target_high=22, max_repeat=9):
+        self.name = 'Projectile'
+        <span class="comment"># define environment bounds</span>
+        self.observation_space = Box(low=target_low, high=target_high, shape=(1,), dtype=np.int32)
+
+        <span class="comment"># there are 9 actions corresponding to the interval of angles from 5 to 45</span>
+        self.action_space = Discrete(9)
+
+        <span class="comment"># store these for easy access later</span>
+        self.n_actions = self.action_space.n
+        self.n_states = target_high - target_low + 1
+
+        self.v = initial_velocity <span class="comment"># the default value for initial_velocity is 15m/s</span>
+        self.g = g <span class="comment"># the default value for acceleration due to gravity is 9.8m/s²</span>
+        
+        <span class="comment"># the number of times to repeat a target value before moving on to the next</span>
+        self.max_repeat = max_repeat 
+
+        <span class="comment"># lookup the angle values for each action</span>
+        self.action_to_angle = {
+            0:5,
+            1:10,
+            2:15,
+            3:20,
+            4:25, 
+            5:30, 
+            6:35, 
+            7:40,
+            8:45
+        }
+
+        <span class="comment"># create a lookup of discrete state values corresponding to target distances</span>
+        self.target_to_state = {i:x for x,i in enumerate((range(target_low, target_high+1)))}
+
+        <span class="comment"># keep track of the lowest error attained for each target</span>
+        self.min_error = {x:np.inf for x in range(self.observation_space.low[0], self.observation_space.high[0] + 1)} 
+
+
+    def new_target(self):
+        <span class="comment"># pick a target from the list of targets and remove it </span>
+        self.target = self.target_list.pop()
+        
+
+    def get_obs(self, verbose=False):
+        <span class="comment"># self.target = self.observation_space.sample() # generate random target</span>
+        self.state = self.target_to_state[self.target] <span class="comment"># represent target as state</span>
+
+        <span class="comment"># if verbose=True, return the true value of the target distance, else return </span>
+        <span class="comment"># its representation as a state value</span>
+        if verbose:
+            return f'Target distance: {self.target}m'
+        else:
+            return self.state
+
+
+    def get_info(self, verbose=True):
+        <span class="comment"># return the number of meters by which we've missed the target</span>
+        self.error = np.abs(self.target - self.range) <span class="comment"># absolute error</span>
+
+        <span class="comment"># if verbose=True, return a full sentence, else just return the value of the error</span>
+        if verbose:
+            return f'Error: {self.error:.2f}m'
+        else:
+            return self.error
+
+    def reset(self, verbose=True):
+        <span class="comment"># store the set of targets we can select from </span>
+        self.target_list = list(range(self.observation_space.low[0], self.observation_space.high[0] + 1))
+
+        random.shuffle(self.target_list) <span class="comment"># shuffle the available targets</span>
+        self.new_target() <span class="comment"># generate a target value</span>
+        self.range = 0 <span class="comment"># the projectile is yet to be shot, so range is still 0</span>
+        self.current_countdown = self.max_repeat <span class="comment"># start the countdown for the current target</span>
+        self.done = False
+
+        return self.get_obs(verbose), self.get_info()
+
+
+    def calc_range(self):
+        <span class="comment"># calculate the range of the projectile using the relation v²·sin(2θ)/g</span>
+        rad = np.pi/180 * self.angle
+        range = (self.v**2) * np.sin(2 * rad) / self.g
+        return range
+
+    def step(self, action):
+        <span class="comment"># print(self.target_list)</span>
+        <span class="comment"># reduce the target repeat countdown by 1</span>
+        self.current_countdown -= 1
+
+        <span class="comment"># map the action to the angle of projectile</span>
+        self.angle = self.action_to_angle[action]
+
+        <span class="comment"># this is the range covered by the projectile at the given angle, save it in the </span>
+        <span class="comment"># lookup table for current ranges</span>
+        self.range = self.calc_range()
+
+        <span class="comment"># evaluate error for this round</span>
+        self.error = self.get_info(verbose=False) 
+
+        <span class="comment"># if the error in this round is less than the history of errors for this round, the </span>
+        <span class="comment"># reward is set to +1. If it is higher, -1. Else, the reward is 0</span>
+        if self.error < self.min_error[self.target]:
+            self.reward = 1 
+            self.min_error[self.target] = self.error <span class="comment"># update error range value</span>
+        elif self.error > self.min_error[self.target]:
+            self.reward = -1
+        elif self.error == self.min_error[self.target]:
+            self.reward = 0
+
+        if self.current_countdown == 0:
+            if len(self.target_list) == 0:
+                <span class="comment"># set self.done to True when there are no values left in self.target_list and end episode</span>
+                self.done = True
+            else:
+                <span class="comment"># else supply a new target and start the repeat counter again</span>
+                self.new_target()
+                self.current_countdown = self.max_repeat
+        
+        return self.get_obs(), self.reward, self.done, self.get_info()
+        
+
+    def render(self):
+        rad = np.pi/180 * self.angle
+        plt.figure()
+        <span class="comment"># plt.clf()</span>
+        params = {'mathtext.default': 'regular' }  <span class="comment"># mathtext, for subscripting 0 in v0 in plot title</span>
+        tmax = (2 * self.v) * np.sin(rad) / self.g <span class="comment"># calculate time of flight</span>
+        t = tmax*np.linspace(0,1,100) <span class="comment"># divide time of flight into 100 uniform time steps</span>
+        self.x = ((self.v * t) * np.cos(rad)) <span class="comment"># horizontal distance at each time step</span>
+        self.y = ((self.v * t) * np.sin(rad)) - ((0.5 * self.g) * (t ** 2)) <span class="comment"># vertical distance </span>
+
+        plt.plot(self.x, self.y, color='g') <span class="comment"># plot path</span>
+
+        <span class="comment"># draw line to target target (i.e desired distance) saved in `self.target`</span>
+        plt.axvline(x = self.target, ls='--', color = 'b', label = f'target: {self.target}m') 
+
+        <span class="comment"># draw projectile at final coordinates</span>
+        plt.scatter(self.x[-1], self.y[-1], color='r', marker="^", s=200)
+
+        plt.ylim([0,10])
+        plt.xlim(left=0)
+        plt.title(f'$v_{0}$ = {self.v}m/s, θ = {self.angle}°, abs. error = {np.abs(self.x[-1]-self.target):.2f}m')
+        plt.legend()
+    
+    def __repr__(self):
+        return f'''Projectile environment: 
+                    Initial velocity: {self.v}m/s
+                    Acceleration due to gravity: {self.g}m/s²
+                    Available angles in degrees:{list(self.action_to_angle.values())}'''
+</pre>  
+
+      <h2>Solving this environment using the <code>Q</code> class</h2>
       <p>Using the range formula provided earlier, we can expect our Q-learning algorithms to learn the closest
         angles.<br> The table below contains actual values of the ranges covered at the provided angles</p>
       <table>
@@ -567,14 +577,14 @@ def reset(self, verbose=True):
       <p>Let's import the Q class defined in the previous article</p>
       <pre>from q_learning import Q</pre>
       <p>Let's train, applying the <code>Q</code> class to the <code>Projectile</code> environment</p>
-      <pre>
-  sim = Projectile()
-  sim.reset()
-  model = Q(sim, exploration_fraction=0.5)
-  model.train()
-  model.show(save_as='converged.png')
+<pre>
+sim = Projectile()
+sim.reset()
+model = Q(sim, exploration_fraction=0.5)
+model.train()
+model.show(save_as='converged.png')
   </pre>
-      <img src="/images/Q table.png" alt="Q table after learning">
+      <img src="../pics/Q table.png" alt="Q table after learning">
       <p>Great! Comparing the actions chosen by the algorithm after training to the correct values in the table above,
         we see we've been able to solve this toy problem using standard Q-Learning.</p>
     
