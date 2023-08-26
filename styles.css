@@ -144,7 +144,7 @@ body.posts-page {
 
 div.post-body {
     grid-area: 1/2/-1/3;
-    overflow: scroll;
+    overflow-y: scroll;
     overflow-x: hidden;
     font-family: 'Open Sans';
     font-weight: 400;
@@ -184,6 +184,11 @@ img.start-pic {
     width: 100%;
     object-fit: cover;
     /* change to contain if the image becomes too cropped in prod) */
+}
+
+div.post-body>img {
+    display: block;
+    width: 100%;
 }
 
 
@@ -255,6 +260,10 @@ a:focus,
 a:active {
     text-decoration: none;
     color: inherit;
+}
+
+div.post-body>a{
+    text-decoration: underline;
 }
 
 div.button2 {
@@ -349,7 +358,7 @@ div.bflex:hover {
 
 div.list-body {
     grid-area: 1/2/-1/4;
-    overflow: scroll;
+    overflow-y: scroll;
     overflow-x: hidden;
     display: flex;
     flex-flow: column nowrap;
@@ -426,4 +435,20 @@ img.thumbnail {
 
 #ind-pos:hover {
     color: var(--black);
+}
+
+pre {
+    background: #5c5c5c3f;
+    font-family: monospace;
+    padding: 0.5rem 1rem
+}
+
+code {
+    font-family: monospace;
+    background: #5c5c5c3f;
+}
+
+span.comment {
+    display: inline;
+    color: rgb(10, 179, 55);
 }
