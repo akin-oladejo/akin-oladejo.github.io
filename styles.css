@@ -191,7 +191,6 @@ div.post-body>img {
     width: 100%;
 }
 
-
 div.rect {
     grid-area: 1/3/-1/-1;
     background: var(--grass);

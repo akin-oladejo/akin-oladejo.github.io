@@ -197,11 +197,11 @@
 
     <p>Having computed the one-step return, we need to know the direction we should change the current action-value:
       whether to increase or decrease it. Therefore, we subtract the old action-value from the newly computed TD
-      target. This difference is called the <b>TD error</b>:
+      target. This difference is called the <b>TD error</b>:</p>
 
       <img src="../pics/td error.png" alt="TD Error">
 
-      The value of TD error tells us whether to increase or decrease the action-value. If TD error is positive, the
+      <p>The value of TD error tells us whether to increase or decrease the action-value. If TD error is positive, the
       update step increases the action-value, otherwise it decreases it.
     </p>
     <p>
@@ -261,23 +261,23 @@ def __init__(self,
 
 <pre>
 def greedy_policy(self):
-<span class="comment">'''Choose the action with the highest q-value for that state'''</span>
-  return np.argmax(self.qtable[self.state])
+    <span class="comment">'''Choose the action with the highest q-value for that state'''</span>
+    return np.argmax(self.qtable[self.state])
         
 def epsilon_greedy_policy(self, epsilon):
-<span class="comment">'''Choose any action sometimes, other times choose the one with high q-value'''</span>
+    <span class="comment">'''Choose any action sometimes, other times choose the one with high q-value'''</span>
 
-  <span class="comment"># generate probability value to match epsilon against</span>
-  rando = random.uniform(0,1)
+    <span class="comment"># generate probability value to match epsilon against</span>
+    rando = random.uniform(0,1)
 
-  <span class="comment"># if value < epsilon, explore (because we will be decaying epsilon gradually)</span>
-  if rando < epsilon:
-      action = self.env.action_space.sample()
-  <span class="comment"># else, exploit</span>
-  else:
-      action = np.argmax(self.qtable[self.state])
-  
-  return action
+    <span class="comment"># if value < epsilon, explore (because we will be decaying epsilon gradually)</span>
+    if rando < epsilon:
+        action = self.env.action_space.sample()
+    <span class="comment"># else, exploit</span>
+    else:
+        action = np.argmax(self.qtable[self.state])
+    
+    return action
 </pre>
 
     <h3>The <code>train</code> method</h3>
@@ -305,66 +305,64 @@ def epsilon_greedy_policy(self, epsilon):
     </ol>
 
     <pre class="py">
-def train(self, train_episodes:int = 5000): 
+def train(self, train_episodes:int = 5000):     
+    <span class="comment"># calculate the number of timesteps to anneal exploration</span>
+    self.n_exploration_timesteps = int(self.exploration_fraction * train_episodes )
+    self.epsilon_values = np.linspace(self.max_epsilon, self.min_epsilon, self.n_exploration_timesteps)
+
+    for episode in tqdm(range(train_episodes)):
+        <span class="comment"># adjust epsilon</span>
+        if episode < self.n_exploration_timesteps:
+            self.epsilon = self.epsilon_values[episode]
+        else:
+            self.epsilon = self.min_epsilon
+
+        self.state, _ = self.env.reset(verbose=False) <span class="comment"># reset the episode</span>
         
-        <span class="comment">calculate the number of timesteps to anneal exploration</span>
-        self.n_exploration_timesteps = int(self.exploration_fraction * train_episodes )
-        self.epsilon_values = np.linspace(self.max_epsilon, self.min_epsilon, self.n_exploration_timesteps)
-
-        for episode in tqdm(range(train_episodes)):
-            <span class="comment">adjust epsilon</span>
-            <span class="comment">self.epsilon = self.min_epsilon + (self.max_epsilon-self.min_epsilon)*np.exp(-self.decay_rate*episode)</span>
+        #train loop
+        while not self.env.done:
+            <span class="comment"># print(self.state)</span>
             if episode < self.n_exploration_timesteps:
-                self.epsilon = self.epsilon_values[episode]
+                self.action = self.env.action_space.sample()
             else:
-                self.epsilon = self.min_epsilon
+                self.action = self.greedy_policy()
 
-            self.state, _ = self.env.reset(verbose=False) <span class="comment">reset the episode</span>
+            <span class="comment"># take an ε-greedy action</span>
+            <span class="comment"># self.action = self.epsilon_greedy_policy(self.epsilon)</span> 
+            self.new_state, reward, done, info = self.env.step(self.action)
             
-            #train loop
-            while not self.env.done:
-                <span class="comment">print(self.state)</span>
-                if episode < self.n_exploration_timesteps:
-                    self.action = self.env.action_space.sample()
-                else:
-                    self.action = self.greedy_policy()
+            <span class="comment"># update self.qtable using Q(s,a):= Q(s,a) + lr [R(s,a) + gamma * max Q(s',a') - Q(s,a)]</span>
+            self.td_target = reward + self.gamma*np.max(self.qtable[self.new_state]) <span class="comment"># compute the one-step return</span>
+            self.td_error = self.td_target - self.qtable[self.state][self.action]
+            self.qtable[self.state][self.action] = self.qtable[self.state][self.action] + (self.lr * self.td_error)
 
-                <span class="comment">take an ε-greedy action</span>
-                <span class="comment">self.action = self.epsilon_greedy_policy(self.epsilon) <span class="comment">uncomment this</span>
-                self.new_state, reward, done, info = self.env.step(self.action)
-                
-                <span class="comment">update self.qtable using Q(s,a):= Q(s,a) + lr [R(s,a) + gamma * max Q(s',a') - Q(s,a)]</span>
-                self.td_target = reward + self.gamma*np.max(self.qtable[self.new_state]) <span class="comment">compute the one-step return</span>
-                self.td_error = self.td_target - self.qtable[self.state][self.action]
-                self.qtable[self.state][self.action] = self.qtable[self.state][self.action] + (self.lr * self.td_error)
-  
-                <span class="comment"><span class="comment">Render the env</span>
-                <span class="comment">self.env.render()</span>
-                <span class="comment"><span class="comment">Wait a bit before the next frame </span>
-                <span class="comment">sleep(0.001)</span>
+            <span class="comment"># Render the env</span>
+            <span class="comment"># self.env.render()</span>
+            <span class="comment"># Wait a bit before the next frame </span>
+            <span class="comment"># sleep(0.001)</span>
 
-                <span class="comment">if done, terminate</span>
-                if done:
-                    break
+            <span class="comment"># if done, terminate</span>
+            if done:
+                break
 
-                self.state = self.new_state
+            self.state = self.new_state
 </pre>
     <h3>Visualizing the Q-Table</h3>
     Below is the logic to visualize the q-table using seaborn a visualization library
     <pre class="py">
 def show(self):
-    <span class="comment">plot the qtable as a heatmap</span>
+    <span class="comment"># plot the qtable as a heatmap</span>
     plt.figure(figsize=(10,5))
     plt.title(f'Qtable for {self.env.name} environment')
     ax = sns.heatmap(self.qtable, annot=True, linecolor='pink', linewidths=0.2, cmap='Greys')
-    ax.set(xlabel='angle(°)', ylabel='target distance(m)') <span class="comment">label axes</span>
+    ax.set(xlabel='angle(°)', ylabel='target distance(m)') <span class="comment"># label axes</span>
     plt.xticks(ticks=np.arange(self.env.n_actions)+0.5, labels=self.env.action_to_angle.values(), ha='center') <span class="comment">change xticks to angles</span>
     state_to_target = {j:i for i,j in self.env.target_to_state.items()}
     plt.yticks(ticks=np.arange(self.env.n_states)+0.5, labels=state_to_target.values(), va='center')
 </pre>
 
     <h2>Putting it all together: the Q class</h2>
-    <pre class="py">
+    <pre>
 class Q():
   def __init__(self, 
                 env:Env,
@@ -374,13 +372,13 @@ class Q():
                 lr:float = 0.003,
                 gamma:float = 1.0):
       
-    <span class="comment">store the environment</span>
+    <span class="comment"># store the environment</span>
     self.env = env
 
-    <span class="comment">create table</span>
+    <span class="comment"># create table</span>
     self.qtable = np.zeros(shape=(self.env.n_states, self.env.n_actions))
 
-    <span class="comment">set hyperparameters</span>
+    <span class="comment"># set hyperparameters</span>
     self.lr = lr
     self.gamma = gamma
     self.min_epsilon = min_epsilon
@@ -398,13 +396,13 @@ class Q():
       '''
       Choose any action sometimes, other times choose the one with high q-value
       '''
-      <span class="comment">generate probability value to match epsilon against</span>
+      <span class="comment"># generate probability value to match epsilon against</span>
       rando = random.uniform(0,1)
 
-      <span class="comment">if value < epsilon, explore (because we will be decaying epsilon gradually)</span>
+      <span class="comment"># if value < epsilon, explore (because we will be decaying epsilon gradually)</span>
       if rando < epsilon:
           action = self.env.action_space.sample()
-      <span class="comment">else, exploit</span>
+      <span class="comment"># else, exploit</span>
       else:
           action = np.argmax(self.qtable[self.state])
       
@@ -412,43 +410,43 @@ class Q():
 
   def train(self, train_episodes:int = 5000): 
       
-      <span class="comment">calculate the number of timesteps to anneal exploration</span>
+      <span class="comment"># calculate the number of timesteps to anneal exploration</span>
       self.n_exploration_timesteps = int(self.exploration_fraction * train_episodes )
       self.epsilon_values = np.linspace(self.max_epsilon, self.min_epsilon, self.n_exploration_timesteps)
 
       for episode in tqdm(range(train_episodes)):
-          <span class="comment">adjust epsilon</span>
-          <span class="comment">self.epsilon = self.min_epsilon + (self.max_epsilon-self.min_epsilon)*np.exp(-self.decay_rate*episode)</span>
+          <span class="comment"># adjust epsilon</span>
+          <span class="comment"># self.epsilon = self.min_epsilon + (self.max_epsilon-self.min_epsilon)*np.exp(-self.decay_rate*episode)</span>
           if episode < self.n_exploration_timesteps:
               self.epsilon = self.epsilon_values[episode]
           else:
               self.epsilon = self.min_epsilon
 
-          self.state, _ = self.env.reset(verbose=False) <span class="comment">reset the episode</span>
+          self.state, _ = self.env.reset(verbose=False) <span class="comment"># reset the episode</span>
           
           #train loop
           while not self.env.done:
-              <span class="comment">print(self.state)</span>
+              <span class="comment"># print(self.state)</span>
               if episode < self.n_exploration_timesteps:
                   self.action = self.env.action_space.sample()
               else:
                   self.action = self.greedy_policy()
 
-              <span class="comment">take an ε-greedy action</span>
-              <span class="comment">self.action = self.epsilon_greedy_policy(self.epsilon) <span class="comment">uncomment this</span>
+              <span class="comment"># take an ε-greedy action</span>
+              <span class="comment"># self.action = self.epsilon_greedy_policy(self.epsilon)</span>
               self.new_state, reward, done, info = self.env.step(self.action)
               
-              <span class="comment">update self.qtable using Q(s,a):= Q(s,a) + lr [R(s,a) + gamma * max Q(s',a') - Q(s,a)]</span>
-              self.td_target = reward + self.gamma*np.max(self.qtable[self.new_state]) <span class="comment">compute the one-step return</span>
+              <span class="comment"># update self.qtable using Q(s,a):= Q(s,a) + lr [R(s,a) + gamma * max Q(s',a') - Q(s,a)]</span>
+              self.td_target = reward + self.gamma*np.max(self.qtable[self.new_state]) <span class="comment"># compute the one-step return</span>
               self.td_error = self.td_target - self.qtable[self.state][self.action]
               self.qtable[self.state][self.action] = self.qtable[self.state][self.action] + (self.lr * self.td_error)
 
-              <span class="comment"><span class="comment">Render the env</span>
-              <span class="comment">self.env.render()</span>
-              <span class="comment"><span class="comment">Wait a bit before the next frame </span>
-              <span class="comment">sleep(0.001)</span>
+              <span class="comment"># Render the env</span>
+              <span class="comment"># self.env.render()</span>
+              <span class="comment"># Wait a bit before the next frame </span>
+              <span class="comment"># sleep(0.001)</span>
 
-              <span class="comment">if done, terminate</span>
+              <span class="comment"># if done, terminate</span>
               if done:
                   break
 
@@ -459,16 +457,16 @@ class Q():
       return f"Run the 'Q.show()' method to show the Qtable better\n{self.qtable}"
       
   def show(self, save_as:str):
-      <span class="comment">plot the qtable as a heatmap</span>
+      <span class="comment"># plot the qtable as a heatmap</span>
       plt.figure(figsize=(10,5))
       plt.title(f'Qtable for {self.env.name} environment')
       ax = sns.heatmap(self.qtable, annot=True, linecolor='pink', linewidths=0.2, cmap='Greys')
-      ax.set(xlabel='angle(°)', ylabel='target distance(m)') <span class="comment">label axes</span>
-      plt.xticks(ticks=np.arange(self.env.n_actions)+0.5, labels=self.env.action_to_angle.values(), ha='center') <span class="comment">change xticks to angles</span>
+      ax.set(xlabel='angle(°)', ylabel='target distance(m)') <span class="comment"># label axes</span>
+      plt.xticks(ticks=np.arange(self.env.n_actions)+0.5, labels=self.env.action_to_angle.values(), ha='center') <span class="comment"># change xticks to angles</span>
       state_to_target = {j:i for i,j in self.env.target_to_state.items()}
       plt.yticks(ticks=np.arange(self.env.n_states)+0.5, labels=state_to_target.values(), va='center')
       
-      <span class="comment">save image to file</span>
+      <span class="comment"># save image to file</span>
       if save_as:
           plt.savefig(save_as)
 </pre>
