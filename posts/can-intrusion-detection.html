@@ -248,6 +248,7 @@ F1 Scores of the Frequency Detection method:
 <img src="../pics/freq-2.png" alt="Results of the frequency-based method on the test set after tuning. Performance is near perfect">
 
     <h3>Results (post-tuning)</h3>
+    <p>This is the performance of the tuned model on the holdout set:</p>
 <pre>
 F1 Scores of the Frequency Detection method:
 Correlated Signal : 0.97778
@@ -288,12 +289,50 @@ Reverse Light Off : 0.26673
 Reverse Light On : 0.30615
 </pre>
     
-<img src="../pics/lof-1.png" alt="Results of the density-based method on the test set. Performance is below average">
+<img src="../pics/lof-1.png" alt="Results of the density-based method on the test set. Performance is average">
 
     <h3>Tuning</h3>
+<p>The <code>LocalOutlierFactor</code> implementation in sklearn has several hyperparameters including:</p>
 
+<ul>
+    <li><code>n_neighbors</code>: the number of neighbors to use by default for kneighbors queries</li>
+    <li><code>algorithm</code>: the algorithm used to compare the nearest neighbors</li>
+    <li><code>leaf_size</code>:  used when either KDTree or BallTree algorithms are used for comparing the nearest neighbors</li>
+</ul>
+
+<p>To tune this model, the <code>HalvingGridSearchCV</code> will be used. <code>HalvingGridSearchCV</code> is an elimination variant of the exhaustive
+     Grid Search which excludes poor performing hyperparameter combinations in successive stages like a tournament. Using this
+      search method across the given hyperparameter space, we are able to save time and computation resources as opposed to using
+       <code>GridSearchCV</code>.</p>
+
+       <p>Note that there will be slight workarounds for the tuning step:</p>
+       <ol>
+        <li>All attack data in the test folder will be used for tuning. After tuning, the updated LOF will be tested on all the attacks in the validation set.
+             This means concatenating the attack data.</li>
+        <li>The version of <code>LocalOutlierFactor</code> used here does not set <code>novelty</code> to true. It is essentially an outlier detection estimator.
+             The focus here is a ballpark for <code>n_neighbors</code> that will be suitable enough for the development of the intrusion detection system.</li>
+       </ol>
+
+<p>The hyperparameter search reveals an <code>n_neighbors</code> value of 90 to be the best provided candidate. Let's see how it performs on the test set:</p>
+<pre>
+F1 Scores of the Local Outlier Factor method:
+Correlated Signal   : 0.43746
+Fuzzing             : 0.25827
+Max Speedometer     : 0.27541
+Reverse Light Off   : 0.2719
+Reverse Light On    : 0.31505
+</pre>
+<img src="../pics/lof-2.png" alt="Results of the tuned density-based method on the test set. Performance is average">
     <h3>Results (post-tuning)</h3>
-
+<p>This is the performance of the tuned model on the holdout set:</p>
+<pre>
+Correlated Signal   : 0.41439
+Fuzzing             : 0.22781
+Max Speedometer     : 0.44358
+Reverse Light Off   : 0.40447
+Reverse Light On    : 0.39205
+</pre>
+<img src="../pics/lof-3.png" alt="Results of the tuned density-based method on the validation set. Performance is average">
     <h2>Method 3: Reconstruction Error</h2>
     <p>Autoencoders are a deep-learning architecture with a quirk: the input and output layers have the same number of
     neurons, with a bottleneck in between. Basically, they are trained to copy their input to their output. They can be
