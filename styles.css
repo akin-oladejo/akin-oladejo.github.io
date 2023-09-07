@@ -445,6 +445,9 @@ pre {
 code {
     font-family: monospace;
     background: #5c5c5c3f;
+    border: 0.01rem solid var(--shy-dark);
+    border-radius: 0.01rem;
+    padding: 0.01rem
 }
 
 span.comment {
